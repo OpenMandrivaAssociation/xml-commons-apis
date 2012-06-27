@@ -1,6 +1,6 @@
 Name:          xml-commons-apis
 Version:       1.4.01
-Release:       6
+Release:       7
 Summary:       APIs for DOM, SAX, and JAXP
 Group:         Development/Java
 License:       ASL 2.0 and W3C and Public Domain
@@ -12,8 +12,9 @@ URL:           http://xml.apache.org/commons/
 Source0:       xml-commons-external-%{version}-src.tar.gz
 Source1:       %{name}-MANIFEST.MF
 Source2:       %{name}-ext-MANIFEST.MF
+Source3:       http://repo1.maven.org/maven2/xml-apis/xml-apis/2.0.2/xml-apis-2.0.2.pom
+Source4:       http://repo1.maven.org/maven2/xml-apis/xml-apis-ext/1.3.04/xml-apis-ext-1.3.04.pom
 
-BuildRoot:     %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildArch:     noarch
 
@@ -23,6 +24,8 @@ BuildRequires: ant
 BuildRequires: zip
 Requires:      java
 Requires:      jpackage-utils
+Requires(post):    jpackage-utils
+Requires(postun):  jpackage-utils
 
 Obsoletes:     xml-commons < %{version}-%{release}
 Provides:      xml-commons = %{version}-%{release}
@@ -62,11 +65,14 @@ iconv -f iso8859-1 -t utf-8 LICENSE.dom-documentation.txt > \
 iconv -f iso8859-1 -t utf-8 LICENSE.dom-software.txt > \
   LICENSE.dom-sof.temp && mv -f LICENSE.dom-sof.temp LICENSE.dom-software.txt
 
+# remove bogus section from poms
+cp %{SOURCE3} %{SOURCE4} .
+sed -i '/distributionManagement/,/\/distributionManagement/ {d}' *.pom
+
 %build
 ant -Dant.build.javac.source=1.5 -Dant.build.javac.target=1.5 jar javadoc
 
 %install
-rm -rf %{buildroot}
 
 # inject OSGi manifests
 mkdir -p META-INF
@@ -78,42 +84,45 @@ touch META-INF/MANIFEST.MF
 zip -u build/xml-apis-ext.jar META-INF/MANIFEST.MF
 
 # Jars
-install -pD -T build/xml-apis.jar %{buildroot}%{_javadir}/%{name}-%{version}.jar
-install -pD -T build/xml-apis-ext.jar %{buildroot}%{_javadir}/%{name}-ext-%{version}.jar
+install -pD -T build/xml-apis.jar %{buildroot}%{_javadir}/%{name}.jar
+install -pDm 644 xml-apis-[0-9]*.pom %{buildroot}/%{_mavenpomdir}/JPP-%{name}.pom
+%add_to_maven_depmap xml-apis xml-apis %{version} JPP %{name}
 
-# Jar versioning
-(cd %{buildroot}%{_javadir} && for jar in %{name}-%{version}.jar; do ln -sf ${jar} dom3-${jar}; done)
-(cd %{buildroot}%{_javadir} && for jar in *-%{version}.jar; do ln -sf ${jar} `echo $jar| sed "s|-%{version}||g"`; done)
+install -pD -T build/xml-apis-ext.jar %{buildroot}%{_javadir}/%{name}-ext.jar
+install -pDm 644 xml-apis-ext*.pom %{buildroot}/%{_mavenpomdir}/JPP-%{name}-ext.pom
+%add_to_maven_depmap xml-apis xml-apis-ext %{version} JPP %{name}-ext
+
 # for better interoperability with the jpp apis packages
 ln -sf %{name}.jar %{buildroot}%{_javadir}/jaxp13.jar
 ln -sf %{name}.jar %{buildroot}%{_javadir}/jaxp.jar
 ln -sf %{name}.jar %{buildroot}%{_javadir}/xml-commons-jaxp-1.3-apis.jar
 
 # Javadocs
-mkdir -p %{buildroot}%{_javadocdir}/%{name}-%{version}
-cp -pr build/docs/javadoc/* \
-  %{buildroot}%{_javadocdir}/%{name}-%{version}
-ln -s %{name}-%{version} %{buildroot}%{_javadocdir}/%{name} 
-
+mkdir -p %{buildroot}%{_javadocdir}/%{name}
+cp -pr build/docs/javadoc/* %{buildroot}%{_javadocdir}/%{name}
+ 
 # prevent apis javadoc from being included in doc
 rm -rf build/docs/javadoc
 
-%clean
-rm -rf %{buildroot}
+%post
+%update_maven_depmap
+
+%postun
+%update_maven_depmap
 
 %files
-%defattr(-,root,root,-)
 %doc LICENSE NOTICE 
 %doc LICENSE.dom-documentation.txt README.dom.txt
 %doc LICENSE.dom-software.txt LICENSE.sac.html
 %doc LICENSE.sax.txt README-sax  README.sax.txt
 %{_javadir}/*
+%{_mavendepmapfragdir}/%{name}
+%{_mavenpomdir}/JPP-%{name}.pom
+%{_mavenpomdir}/JPP-%{name}-ext.pom
 
 %files manual
-%defattr(-,root,root,-)
 %doc build/docs/*
 
 %files javadoc
-%defattr(-,root,root,-)
 %{_javadocdir}/*
 
