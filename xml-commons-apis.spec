@@ -126,3 +126,23 @@ rm -rf build/docs/javadoc
 %files javadoc
 %{_javadocdir}/*
 
+
+
+%changelog
+* Wed Jun 27 2012 Guilherme Moro <guilherme@mandriva.com> 1.4.01-7
++ Revision: 807094
+- sync with fedora
+  Add missing packages to manifest - javax.xml.stream, javax.xml.stream.events,
+  javax.xml.stream.util, javax.xml.transform.stax
+  Add maven metadata
+  Versionless jars & javadocs
+
+* Thu Dec 15 2011 Guilherme Moro <guilherme@mandriva.com> 1.4.01-6
++ Revision: 741602
+- rebuild to fix deps
+
+* Sun Nov 27 2011 Guilherme Moro <guilherme@mandriva.com> 1.4.01-5
++ Revision: 734301
+- rebuild
+- imported package xml-commons-apis
+
