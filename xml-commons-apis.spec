@@ -87,6 +87,7 @@ zip -u build/xml-apis-ext.jar META-INF/MANIFEST.MF
 install -pD -T build/xml-apis.jar %{buildroot}%{_javadir}/%{name}.jar
 install -pDm 644 xml-apis-[0-9]*.pom %{buildroot}/%{_mavenpomdir}/JPP-%{name}.pom
 %add_to_maven_depmap xml-apis xml-apis %{version} JPP %{name}
+%add_maven_depmap -a xerces:dom3-xml-apis
 
 install -pD -T build/xml-apis-ext.jar %{buildroot}%{_javadir}/%{name}-ext.jar
 install -pDm 644 xml-apis-ext*.pom %{buildroot}/%{_mavenpomdir}/JPP-%{name}-ext.pom
