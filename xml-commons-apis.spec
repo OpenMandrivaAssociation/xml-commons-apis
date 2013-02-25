@@ -1,53 +1,58 @@
-Name:          xml-commons-apis
-Version:       1.4.01
-Release:       8
-Summary:       APIs for DOM, SAX, and JAXP
-Group:         Development/Java
-License:       ASL 2.0 and W3C and Public Domain
-URL:           http://xml.apache.org/commons/
+Name:		xml-commons-apis
+Epoch:		1
+Version:	1.4.01
+Release:	9
+Summary:	APIs for DOM, SAX, and JAXP
+Group:		Development/Java
+License:	ASL 2.0 and W3C and Public Domain
+URL:		http://xml.apache.org/commons/
 
 # From source control because the published tarball doesn't include some docs:
 #   svn export http://svn.apache.org/repos/asf/xml/commons/tags/xml-commons-external-1_4_01/java/external/
 #   tar czf xml-commons-external-1.4.01-src.tar.gz external
-Source0:       xml-commons-external-%{version}-src.tar.gz
-Source1:       %{name}-MANIFEST.MF
-Source2:       %{name}-ext-MANIFEST.MF
-Source3:       http://repo1.maven.org/maven2/xml-apis/xml-apis/2.0.2/xml-apis-2.0.2.pom
-Source4:       http://repo1.maven.org/maven2/xml-apis/xml-apis-ext/1.3.04/xml-apis-ext-1.3.04.pom
+Source0:	xml-commons-external-%{version}-src.tar.gz
+Source1:	%{name}-MANIFEST.MF
+Source2:	%{name}-ext-MANIFEST.MF
+Source3:	http://repo1.maven.org/maven2/xml-apis/xml-apis/2.0.2/xml-apis-2.0.2.pom
+Source4:	http://repo1.maven.org/maven2/xml-apis/xml-apis-ext/1.3.04/xml-apis-ext-1.3.04.pom
 
+BuildArch:	noarch
 
-BuildArch:     noarch
+BuildRequires:	java-1.6.0-openjdk-devel
+BuildRequires:	jpackage-utils
+BuildRequires:	ant
+BuildRequires:	zip
+Requires:	java
+Requires:	jpackage-utils
+Requires(post):	jpackage-utils
+Requires(postun):	jpackage-utils
 
-BuildRequires: java-devel >= 0:1.6.0
-BuildRequires: jpackage-utils
-BuildRequires: ant
-BuildRequires: zip
-Requires:      java
-Requires:      jpackage-utils
-Requires(post):    jpackage-utils
-Requires(postun):  jpackage-utils
-
-Obsoletes:     xml-commons < %{version}-%{release}
-Provides:      xml-commons = %{version}-%{release}
-
-# TODO: Ugh, this next line should be dropped since it actually provides JAXP 1.4 now...
-Provides:      xml-commons-jaxp-1.3-apis = %{version}-%{release}
+Obsoletes:	xml-commons < %EVRD
+Provides:	xml-commons = %EVRD
+Obsoletes:	xml-commons-jaxp-1.4-apis < %EVRD
+Provides:	xml-commons-jaxp-1.4-apis = %{version}-%{release}
 
 %description
 xml-commons-apis is designed to organize and have common packaging for
 the various externally-defined standard interfaces for XML. This
 includes the DOM, SAX, and JAXP. 
 
+This package provides an implementation of the JAXP 1.4 API.
+
 %package manual
-Summary:       Manual for %{name}
-Group:         Development/Java
+Summary:	Manual for %{name}
+Group:		Development/Java
+Obsoletes:	xml-commons-jaxp-1.4-apis-manual < %EVRD
+Provides:	xml-commons-jaxp-1.4-apis-manual = %EVRD
 
 %description manual
 %{summary}.
 
 %package javadoc
-Summary:       Javadoc for %{name}
-Group:         Development/Java
+Summary:	Javadoc for %{name}
+Group:		Development/Java
+Obsoletes:	xml-commons-jaxp-1.4-apis-javadoc < %EVRD
+Provides:	xml-commons-jaxp-1.4-apis-javadoc = %EVRD
 
 %description javadoc
 %{summary}.
@@ -94,9 +99,9 @@ install -pDm 644 xml-apis-ext*.pom %{buildroot}/%{_mavenpomdir}/JPP-%{name}-ext.
 %add_to_maven_depmap xml-apis xml-apis-ext %{version} JPP %{name}-ext
 
 # for better interoperability with the jpp apis packages
-ln -sf %{name}.jar %{buildroot}%{_javadir}/jaxp13.jar
+ln -sf %{name}.jar %{buildroot}%{_javadir}/jaxp14.jar
 ln -sf %{name}.jar %{buildroot}%{_javadir}/jaxp.jar
-ln -sf %{name}.jar %{buildroot}%{_javadir}/xml-commons-jaxp-1.3-apis.jar
+ln -sf %{name}.jar %{buildroot}%{_javadir}/xml-commons-jaxp-1.4-apis.jar
 
 # Javadocs
 mkdir -p %{buildroot}%{_javadocdir}/%{name}
