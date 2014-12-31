@@ -6,9 +6,9 @@ Epoch:         1
 %endif
 Name:          xml-commons-apis
 Version:       1.4.01
-Release:       14.1%{?dist}
+Release:       18.1
 Summary:       APIs for DOM, SAX, and JAXP
-
+Group:         Development/Java
 License:       ASL 2.0 and W3C and Public Domain
 URL:           http://xml.apache.org/commons/
 
@@ -29,8 +29,6 @@ BuildRequires: ant
 BuildRequires: zip
 Requires:      java
 Requires:      jpackage-utils
-Requires(post):    jpackage-utils
-Requires(postun):  jpackage-utils
 
 Obsoletes:     xml-commons < %{version}-%{release}
 Provides:      xml-commons = %{version}-%{release}
@@ -89,7 +87,6 @@ zip -u build/xml-apis-ext.jar META-INF/MANIFEST.MF
 # Jars
 install -pD -T build/xml-apis.jar %{buildroot}%{_javadir}/%{name}.jar
 install -pDm 644 xml-apis-[0-9]*.pom %{buildroot}/%{_mavenpomdir}/JPP-%{name}.pom
-%add_maven_depmap JPP-%{name}.pom %{name}.jar
 %add_maven_depmap -a xerces:dom3-xml-apis
 
 install -pD -T build/xml-apis-ext.jar %{buildroot}%{_javadir}/%{name}-ext.jar
@@ -108,20 +105,12 @@ cp -pr build/docs/javadoc/* %{buildroot}%{_javadocdir}/%{name}
 # prevent apis javadoc from being included in doc
 rm -rf build/docs/javadoc
 
-%pre javadoc
-# workaround for rpm bug, can be removed in F-18
-[ $1 -gt 1 ] && [ -L %{_javadocdir}/%{name} ] && \
-rm -rf $(readlink -f %{_javadocdir}/%{name}) %{_javadocdir}/%{name} || :
-
-%files
+%files -f .mfiles
 %doc LICENSE NOTICE
 %doc LICENSE.dom-documentation.txt README.dom.txt
 %doc LICENSE.dom-software.txt LICENSE.sac.html
 %doc LICENSE.sax.txt README-sax  README.sax.txt
 %{_javadir}/*
-%{_mavendepmapfragdir}/%{name}
-%{_mavenpomdir}/JPP-%{name}.pom
-%{_mavenpomdir}/JPP-%{name}-ext.pom
 
 %files manual
 %doc build/docs/*
