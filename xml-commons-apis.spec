@@ -6,7 +6,7 @@ Epoch:         1
 %endif
 Name:          xml-commons-apis
 Version:       1.4.01
-Release:       18.1
+Release:       18.2
 Summary:       APIs for DOM, SAX, and JAXP
 Group:         Development/Java
 License:       ASL 2.0 and W3C and Public Domain
